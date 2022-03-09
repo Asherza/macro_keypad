@@ -26,4 +26,4 @@ hid = hid_controller()
 km = key_manager([board.GP10, board.GP11, board.GP12, board.GP13], 'default.cfg')
 
 while True:
-    pass
+    print(km.read_key_switches())
