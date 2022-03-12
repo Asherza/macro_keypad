@@ -2,9 +2,8 @@ import board
 import busio
 
 from display_controller import display_controller
-from hid_controller import hid_controller
+from macro_executor import macro_executor
 from key_manager import key_manager
-
 
 # This "enum" is used as a state machine pointer to know what mode of operation
 # the keypad is in. Don't change these variables, they have no protection :)
@@ -13,17 +12,16 @@ class SM():
     operation_mode = 1  # Normal mode of operation
     config_mode = 2     # Configuration mode
 
-
-
 # Start the state_machine flag in init mode
 state_machine_mode = SM.init
 
 # Initalize the display, and the keypad with its default values
 display = display_controller(board.GP1, board.GP0)
-hid = hid_controller()
+
+me = macro_executor()
 
 # Set up our key manager with the keys we want.
-km = key_manager([board.GP10, board.GP11, board.GP12, board.GP13], 'default.cfg')
+km = key_manager([board.GP10, board.GP11, board.GP12, board.GP13], 'default.cfg', me)
 
 while True:
-    print(km.read_key_switches())
+    km.scan_and_run_switches()

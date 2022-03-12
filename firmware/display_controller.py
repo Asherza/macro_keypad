@@ -6,17 +6,17 @@ import busio
 
 # This class is used to drive the lcd display
 class display_controller:
-    # Init the display and object 
+    # Init the display and object
     def __init__(self, i2c_SCL_pin, i2c_SDA_pin):
 
         displayio.release_displays()
-        
+
         i2c = busio.I2C(i2c_SCL_pin, i2c_SDA_pin)
-        
+
         display_bus = displayio.I2CDisplay(i2c, device_address=0x3C)
 
         self.display = adafruit_displayio_ssd1306.SSD1306(display_bus, width=128, height=32)
-        
+
         self.splash = displayio.Group()
 
         self.draw_hello_world()
@@ -44,4 +44,3 @@ class display_controller:
         text_area = label.Label(terminalio.FONT, text=text, color=0xFFFF00, x=28, y=15)
         self.splash.append(text_area)
 
-    
