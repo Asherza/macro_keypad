@@ -23,24 +23,28 @@ class display_controller:
 
     def draw_hello_world(self):
 
-        self.display.show(self.splash)
+        # Setup the file as the bitmap data source
+        self.bitmap = displayio.OnDiskBitmap("/basic_menu.bmp")
 
-        color_bitmap = displayio.Bitmap(128, 32, 1)
-        color_palette = displayio.Palette(1)
-        color_palette[0] = 0xFFFFFF  # White
+        # Create a TileGrid to hold the bitmap
+        self.tile_grid = displayio.TileGrid(self.bitmap, pixel_shader=self.bitmap.pixel_shader)
 
-        bg_sprite = displayio.TileGrid(color_bitmap, pixel_shader=color_palette, x=0, y=0)
-        self.splash.append(bg_sprite)
+        # Create a Group to hold the TileGrid
+        self.group = displayio.Group()
 
-        # Draw a smaller inner rectangle
-        inner_bitmap = displayio.Bitmap(118, 24, 1)
-        inner_palette = displayio.Palette(1)
-        inner_palette[0] = 0x000000  # Black
-        inner_sprite = displayio.TileGrid(inner_bitmap, pixel_shader=inner_palette, x=5, y=4)
-        self.splash.append(inner_sprite)
+        # Add the TileGrid to the Group
+        self.group.append(self.tile_grid)
 
-        # Draw a label
-        text = "Hello World!"
-        text_area = label.Label(terminalio.FONT, text=text, color=0xFFFF00, x=28, y=15)
-        self.splash.append(text_area)
+        text_area = label.Label(terminalio.FONT, text="Hello Line 0", color=0xFFFFFF)
+        text_area.x = 0
+        text_area.y = 4
+        text_area.anchor_point = (0.1, 0.8)
 
+        text_area2 = label.Label(terminalio.FONT, text="Hello Line 1", color=0xFFFFFF)
+        text_area2.x = 0
+        text_area2.y = 14
+        text_area2.anchor_point = (0.1, 0.8)
+        self.group.append(text_area)
+        self.group.append(text_area2)
+        # Add the Group to the Display
+        self.display.show(self.group)

@@ -38,8 +38,7 @@ class key_manager():
 
             # Only run the function if our last ks.state was false and we see a high
             # (User has just pressed the button, but we will not trigger if its held)
-            if ks.get_var(['last_state'])[0] == False and ks_state == True:
-                print("Running switch!")
+            if ks.get_var(['last_state']) == False and ks_state == True:
                 ks.run_func()
                 ks.set_var(last_state = ks_state)
             else:
@@ -52,7 +51,7 @@ class key_manager():
         for key_switch in self._switch_list:
             # Set the key_switch function to the macro_exe function
             # lets first gen a new function with the key_switches set macro
-            func = self._macro_exe.gen_macro_func(key_switch.get_var(['macro'])[0])
+            func = self._macro_exe.gen_macro_func(key_switch.get_var(['macro']))
             # Set the key_switch to use the new macro func we created
             key_switch.set_func(func)
 

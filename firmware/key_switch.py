@@ -71,8 +71,17 @@ class key_switch():
             # If our value ended up being None, then we will just add it anyways and let other handle it
             return_list.append(key_val_to_add)
 
-        # return the list we filled, but if arg_list is passed as None, we just return the self.__dict__ of this key_switch
-        return return_list if len(arg_list) > 0 else self.__dict__
+        # return the list we filled,
+        # If arg_list contains more than 1 element, we will return the whole list
+        # If arg_list contains 1 element, then we will return just that element for ease of use (rather than a list)
+        # if arg_list is left blank or not passed, we will return the full __dict__
+        if len(arg_list) > 1:
+            return return_list
+        elif len(arg_list) == 1:
+            return return_list[0]
+        else:
+            return self.__dict__
+
 
     # this function allows the user to set the function of the key_switch
     # This replaces the func that is currently set for the key_switch
@@ -83,5 +92,29 @@ class key_switch():
     # This function will send the *args and **kwargs to the func in case a user wants to pass
     # any params to the function
     def run_func(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
+        if hasattr(self, "func"):
+            print("Running switch!")
+            return self.func(*args, **kwargs)
+        else:
+            print("No function assigned...")
+
+    # This function will delete all memeber variables attached to this key_switch
+    # keep_list is a list that will be saved and not removed.
+    # There is a default keep_list that can be overwritten by passing a user defined one.
+    # This function is dangerous...
+    def clean_vars(self, keep_list = []):
+
+        # There is a default keylist that will keep all the required variables for the key_switch.
+        # The user passes a keep_list, this list will be ignored and the keep_list will be used.
+        default_keep_list = ["_key", "_last_debounce_time", "_last_debounced_state", "_last_debounced_reading_state"]
+        for var in self.__dict__.keys():
+
+            # if keep_list was given, then lets delete the variable unless its found in our keep_list
+            if len(keep_list) > 0 and var not in keep_list:
+                delattr(self, var)
+
+            # If our keeplist was not given, lets delete the variable unless its found in the default_keep_list
+            elif len(keep_list) == 0 and var not in default_keep_list:
+                delattr(self, var)
+
 

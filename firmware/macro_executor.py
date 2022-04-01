@@ -57,11 +57,13 @@ class macro_executor():
                 # lets grab the command within this macro,
                 command_name = command.split(' ')
                 print(command_name)
-                # parse the commands
+                # parse the commands and run the correct functions
                 if command_name[0] == "STRING":
                     self._command_STRING(command_name[1])
                 if command_name[0] == "MOUSE_MOVE":
                     self._command_MOVE_MOUSE(command_name[1])
+                if command_name[0] == "MOUSE_CLICK":
+                    self._command_MOUSE_CLICK(command_name[1])
 
         return run_macro_str
 
@@ -78,3 +80,15 @@ class macro_executor():
         int_list = [int(i) for i in _string.split(',')]
         print(f'Going to move mouse {int_list}')
         self._mouse.move(*int_list)
+
+    # Take in a string that is either l,r,m which represents
+    # Click left mouse button, right mouse button, or middle
+    def _command_MOUSE_CLICK(self, _string):
+        if _string == 'l':
+            self._mouse.click(Mouse.LEFT_BUTTON)
+        elif _string == 'r':
+            self._mouse.click(Mouse.RIGHT_BUTTON)
+        elif _string == 'm':
+            self._mouse.click(Mouse.MIDDLE_BUTTON)
+        else:
+            print("String passed to MOUSE_CLICK was not l,r, or m")
