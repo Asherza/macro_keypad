@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "macro_keypad")(type "KiCad")(uri "/home/scott/projects/macro_keypad/pcb/kikad_libs/macro_keypad.pretty")(options "")(descr ""))
+)

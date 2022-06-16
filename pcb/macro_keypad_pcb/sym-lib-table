@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "macro_keypad")(type "KiCad")(uri "${KIPRJMOD}/macro_keypad.kicad_sym")(options "")(descr ""))
+)
