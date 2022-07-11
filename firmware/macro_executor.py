@@ -1,6 +1,3 @@
-# Some functions and ideas for this file were inspired by
-# The pico-ducky repo found here https://github.com/dbisu/pico-ducky
-
 import usb_hid
 
 # import all required hid releated libs
@@ -10,7 +7,8 @@ from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS as KeyboardLayout
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.mouse import Mouse
 from adafruit_hid.mouse import Mouse
-
+import time
+import adafruit_ducky
 class macro_executor():
 
     def __init__(self):
@@ -22,30 +20,10 @@ class macro_executor():
 
         self._kb = KeyboardLayout(keyboard)
 
-        # anything thing in this list can simpily be ran via the hid command
-        self._commands = {
-            'WINDOWS': Keycode.WINDOWS, 'GUI': Keycode.GUI,
-            'APP': Keycode.APPLICATION, 'MENU': Keycode.APPLICATION, 'SHIFT': Keycode.SHIFT,
-            'ALT': Keycode.ALT, 'CONTROL': Keycode.CONTROL, 'CTRL': Keycode.CONTROL,
-            'DOWNARROW': Keycode.DOWN_ARROW, 'DOWN': Keycode.DOWN_ARROW, 'LEFTARROW': Keycode.LEFT_ARROW,
-            'LEFT': Keycode.LEFT_ARROW, 'RIGHTARROW': Keycode.RIGHT_ARROW, 'RIGHT': Keycode.RIGHT_ARROW,
-            'UPARROW': Keycode.UP_ARROW, 'UP': Keycode.UP_ARROW, 'BREAK': Keycode.PAUSE,
-            'PAUSE': Keycode.PAUSE, 'CAPSLOCK': Keycode.CAPS_LOCK, 'DELETE': Keycode.DELETE,
-            'END': Keycode.END, 'ESC': Keycode.ESCAPE, 'ESCAPE': Keycode.ESCAPE, 'HOME': Keycode.HOME,
-            'INSERT': Keycode.INSERT, 'NUMLOCK': Keycode.KEYPAD_NUMLOCK, 'PAGEUP': Keycode.PAGE_UP,
-            'PAGEDOWN': Keycode.PAGE_DOWN, 'PRINTSCREEN': Keycode.PRINT_SCREEN, 'ENTER': Keycode.ENTER,
-            'SCROLLLOCK': Keycode.SCROLL_LOCK, 'SPACE': Keycode.SPACE, 'TAB': Keycode.TAB,
-            'BACKSPACE': Keycode.BACKSPACE,
-            'A': Keycode.A, 'B': Keycode.B, 'C': Keycode.C, 'D': Keycode.D, 'E': Keycode.E,
-            'F': Keycode.F, 'G': Keycode.G, 'H': Keycode.H, 'I': Keycode.I, 'J': Keycode.J,
-            'K': Keycode.K, 'L': Keycode.L, 'M': Keycode.M, 'N': Keycode.N, 'O': Keycode.O,
-            'P': Keycode.P, 'Q': Keycode.Q, 'R': Keycode.R, 'S': Keycode.S, 'T': Keycode.T,
-            'U': Keycode.U, 'V': Keycode.V, 'W': Keycode.W, 'X': Keycode.X, 'Y': Keycode.Y,
-            'Z': Keycode.Z, 'F1': Keycode.F1, 'F2': Keycode.F2, 'F3': Keycode.F3,
-            'F4': Keycode.F4, 'F5': Keycode.F5, 'F6': Keycode.F6, 'F7': Keycode.F7,
-            'F8': Keycode.F8, 'F9': Keycode.F9, 'F10': Keycode.F10, 'F11': Keycode.F11,
-            'F12': Keycode.F12,
-        }
+        # We're going to hack this library since it wants our 
+        # DUCKY text in a text file, we're going to just pass it boot_out.txt
+        self._duck = adafruit_ducky.Ducky(f"boot_out.txt", keyboard, self._kb)
+
 
     # This function takes in a macro_str and returns a function that can be used to execute the macro
     def gen_macro_func(self, _macro_str):
@@ -64,8 +42,19 @@ class macro_executor():
                     self._command_MOVE_MOUSE(command_name[1])
                 if command_name[0] == "MOUSE_CLICK":
                     self._command_MOUSE_CLICK(command_name[1])
+                if command_name[0] == "DUCKY":
+                    self._command_DUCKY(command_name[1:])
 
         return run_macro_str
+
+    # This function will handle any DUCKY commands
+    # TODO: Update Ducky commands to support a full ducky stack
+    def _command_DUCKY(self, _ducky_list):
+        # Manually set the lines for ducky, this is pretty hacky, but it should work pretty well!
+        self._duck.lines = _ducky_list
+        print(self._duck.lines)
+        # Run the command :)
+        self._duck.loop()
 
     # This function simpily takes the string that is passed from the macro and prints it out
     def _command_STRING(self, _string):
@@ -77,9 +66,10 @@ class macro_executor():
     # the scroll will scroll the mouse wheel a number of ticks
     def _command_MOVE_MOUSE(self, _string):
         # Lets take our string and convert it into ints, and pass it into mouse.move
-        int_list = [int(i) for i in _string.split(',')]
+        int_list = [int(i) if i != 0 else 0 for i in _string.split(',')]
         print(f'Going to move mouse {int_list}')
-        self._mouse.move(*int_list)
+        self._mouse.move(int_list[0], int_list[1],int_list[2])
+        time.sleep(.01)
 
     # Take in a string that is either l,r,m which represents
     # Click left mouse button, right mouse button, or middle
